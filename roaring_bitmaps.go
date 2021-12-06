@@ -14,9 +14,9 @@ func newBitmapPostings(seriesRef ...uint32) *sroar.Bitmap {
 }
 
 func roaringIntersect(p ...*sroar.Bitmap) *sroar.Bitmap {
-	prev := sroar.And(p[0], p[1])
+	prev := sroar.FastAnd(p[0], p[1])
 	for i := 2; i < len(p); i++ {
-		prev = sroar.And(prev, p[i])
+		prev = sroar.FastAnd(prev, p[i])
 	}
 	return prev
 }

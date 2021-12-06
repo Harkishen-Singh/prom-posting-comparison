@@ -831,4 +831,3 @@ type seriesRefSlice []storage.SeriesRef
 func (x seriesRefSlice) Len() int           { return len(x) }
 func (x seriesRefSlice) Less(i, j int) bool { return x[i] < x[j] }
 func (x seriesRefSlice) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
-
