@@ -29,8 +29,6 @@ func getBigEndianPostings(ids []uint32) *bigEndianPostings {
 }
 
 func BenchmarkIntersection(b *testing.B) {
-	bigEndianPs := make([]Postings, 0)
-
 	increments := []int{2, 3, 4, 6, 8, 10, 12, 14, 16, 18, 20}
 	seriesIds := make([][]uint32, len(increments))
 	for i, incr := range increments {
@@ -38,6 +36,7 @@ func BenchmarkIntersection(b *testing.B) {
 	}
 
 	// BigEndian postings.
+	bigEndianPs := make([]Postings, 0)
 	for i := range seriesIds {
 		bigEndianPs = append(bigEndianPs, getBigEndianPostings(seriesIds[i]))
 	}
@@ -59,6 +58,42 @@ func BenchmarkIntersection(b *testing.B) {
 	numRoaring := 0
 	b.Run("Intersect_RoaringBitmapsPostings", func(b *testing.B) {
 		p := roaringIntersect(roaringBitmapPs...)
+		numRoaring = p.GetCardinality()
+	})
+
+	require.Equal(b, numBigEndian, numRoaring)
+}
+
+func BenchmarkUnion(b *testing.B) {
+	increments := []int{2, 3, 4, 6, 8, 10}
+	seriesIds := make([][]uint32, len(increments))
+	for i, incr := range increments {
+		seriesIds[i] = generateSeriesIds(1, 100, incr)
+	}
+
+	// BigEndian postings.
+	bigEndianPs := make([]Postings, 0)
+	for i := range seriesIds {
+		bigEndianPs = append(bigEndianPs, getBigEndianPostings(seriesIds[i]))
+	}
+	numBigEndian := 0
+	b.Run("Union_BigEndianPostings", func(b *testing.B) {
+		p, err := ExpandPostings(Merge(bigEndianPs...))
+		require.NoError(b, err)
+		if numBigEndian == 0 {
+			numBigEndian = len(p)
+		}
+	})
+
+	// Roaring bitmap postings.
+	roaringBitmapPs := make([]*sroar.Bitmap, 0)
+	for i := range seriesIds {
+		roaringBitmapPs = append(roaringBitmapPs, newBitmapPostings(seriesIds[i]...))
+	}
+
+	numRoaring := 0
+	b.Run("Union_RoaringBitmapsPostings", func(b *testing.B) {
+		p := roaringUnion(roaringBitmapPs...)
 		numRoaring = p.GetCardinality()
 	})
 

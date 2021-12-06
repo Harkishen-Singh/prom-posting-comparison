@@ -20,3 +20,11 @@ func roaringIntersect(p ...*sroar.Bitmap) *sroar.Bitmap {
 	}
 	return prev
 }
+
+func roaringUnion(p ...*sroar.Bitmap) *sroar.Bitmap {
+	prev := sroar.FastOr(p[0], p[1])
+	for i := 2; i < len(p); i++ {
+		prev = sroar.FastOr(prev, p[i])
+	}
+	return prev
+}
