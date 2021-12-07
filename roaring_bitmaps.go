@@ -2,8 +2,6 @@ package main
 
 import "github.com/dgraph-io/sroar"
 
-type bitmapPostings []*sroar.Bitmap
-
 // For now, test uint32. After success, test uint64.
 func newBitmapPostings(seriesRef ...uint32) *sroar.Bitmap {
 	bitmap := sroar.NewBitmap()
