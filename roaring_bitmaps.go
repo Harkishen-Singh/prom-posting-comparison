@@ -1,14 +1,24 @@
 package main
 
-import "github.com/dgraph-io/sroar"
+import (
+	"github.com/dgraph-io/sroar"
+)
+
+type bitmapPostings struct {
+	slice []byte
+	b     *sroar.Bitmap
+}
+
+func newBitmapPostingsFromBSlice(l []byte) *bitmapPostings {
+	return &bitmapPostings{
+		slice: l,
+		b:     sroar.FromBuffer(l),
+	}
+}
 
 // For now, test uint32. After success, test uint64.
-func newBitmapPostings(seriesRef ...uint32) *sroar.Bitmap {
-	bitmap := sroar.NewBitmap()
-	for i := range seriesRef {
-		bitmap.Set(uint64(seriesRef[i]))
-	}
-	return bitmap
+func newRoarBitmap(seriesRef ...uint64) *sroar.Bitmap {
+	return sroar.FromSortedList(seriesRef)
 }
 
 func roaringIntersect(p ...*sroar.Bitmap) *sroar.Bitmap {

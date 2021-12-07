@@ -50,9 +50,17 @@ func BenchmarkIntersection(b *testing.B) {
 	})
 
 	// Roaring bitmap postings.
+	seriesIdsUint64 := make([][]uint64, len(seriesIds))
+	for i := range seriesIds {
+		tmp := make([]uint64, 0, len(seriesIds[i]))
+		for j := range seriesIds[i] {
+			tmp = append(tmp, uint64(seriesIds[i][j]))
+		}
+		seriesIdsUint64[i] = tmp
+	}
 	roaringBitmapPs := make([]*sroar.Bitmap, 0)
 	for i := range seriesIds {
-		roaringBitmapPs = append(roaringBitmapPs, newBitmapPostings(seriesIds[i]...))
+		roaringBitmapPs = append(roaringBitmapPs, newRoarBitmap(seriesIdsUint64[i]...))
 	}
 
 	numRoaring := 0
@@ -86,9 +94,17 @@ func BenchmarkUnion(b *testing.B) {
 	})
 
 	// Roaring bitmap postings.
+	seriesIdsUint64 := make([][]uint64, len(seriesIds))
+	for i := range seriesIds {
+		tmp := make([]uint64, 0, len(seriesIds[i]))
+		for j := range seriesIds[i] {
+			tmp = append(tmp, uint64(seriesIds[i][j]))
+		}
+		seriesIdsUint64[i] = tmp
+	}
 	roaringBitmapPs := make([]*sroar.Bitmap, 0)
 	for i := range seriesIds {
-		roaringBitmapPs = append(roaringBitmapPs, newBitmapPostings(seriesIds[i]...))
+		roaringBitmapPs = append(roaringBitmapPs, newRoarBitmap(seriesIdsUint64[i]...))
 	}
 
 	numRoaring := 0
