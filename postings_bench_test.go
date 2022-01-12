@@ -4,7 +4,9 @@ import (
 	"encoding/binary"
 	"testing"
 
+	rb_index "github.com/Harkishen-Singh/prometheus-index-roaringbitmaps/tsdb/index"
 	"github.com/dgraph-io/sroar"
+	be_index "github.com/prometheus/prometheus/tsdb/index"
 	"github.com/stretchr/testify/require"
 )
 
@@ -70,6 +72,93 @@ func BenchmarkIntersection(b *testing.B) {
 	})
 
 	require.Equal(b, numBigEndian, numRoaring)
+}
+
+const be_index_path = "data/index_big_endian"
+const rb_index_path = "data/index_roaring_bitmap"
+
+func BenchmarkIntersectionRealIndex(b *testing.B) {
+	b.Run("Intersect_big_endian_real_index", func(b *testing.B) {
+		irBE, err := be_index.NewFileReader(be_index_path)
+		require.NoError(b, err)
+		defer irBE.Close()
+
+		bePostings_1, err := irBE.Postings("job", "prometheus")
+		require.NoError(b, err)
+
+		bePostings_2, err := irBE.Postings("job", "promscale")
+		require.NoError(b, err)
+
+		bePostings_3, err := irBE.Postings("job", "demo")
+		require.NoError(b, err)
+
+		bePostings_4, err := irBE.Postings("job", "robust")
+		require.NoError(b, err)
+
+		be_index.Intersect(bePostings_1, bePostings_2, bePostings_3, bePostings_4)
+	})
+
+	b.Run("Intersect_roaring_bitmap_real_index", func(b *testing.B) {
+		irRB, err := rb_index.NewFileReader(rb_index_path)
+		require.NoError(b, err)
+		defer irRB.Close()
+
+		rbPostings_1, err := irRB.Postings("job", "prometheus")
+		require.NoError(b, err)
+
+		rbPostings_2, err := irRB.Postings("job", "promscale")
+		require.NoError(b, err)
+
+		rbPostings_3, err := irRB.Postings("job", "demo")
+		require.NoError(b, err)
+
+		rbPostings_4, err := irRB.Postings("job", "robust")
+		require.NoError(b, err)
+
+		rb_index.Intersect(rbPostings_1, rbPostings_2, rbPostings_3, rbPostings_4)
+	})
+}
+
+func BenchmarkUnionRealIndex(b *testing.B) {
+	b.Run("Union_big_endian_real_index", func(b *testing.B) {
+		irBE, err := be_index.NewFileReader(be_index_path)
+		require.NoError(b, err)
+		defer irBE.Close()
+
+		bePostings_1, err := irBE.Postings("job", "prometheus")
+		require.NoError(b, err)
+
+		bePostings_2, err := irBE.Postings("job", "promscale")
+		require.NoError(b, err)
+
+		bePostings_3, err := irBE.Postings("job", "demo")
+		require.NoError(b, err)
+
+		bePostings_4, err := irBE.Postings("job", "robust")
+		require.NoError(b, err)
+
+		be_index.Merge(bePostings_1, bePostings_2, bePostings_3, bePostings_4)
+	})
+
+	b.Run("Union_roaring_bitmap_real_index", func(b *testing.B) {
+		irRB, err := rb_index.NewFileReader(rb_index_path)
+		require.NoError(b, err)
+		defer irRB.Close()
+
+		rbPostings_1, err := irRB.Postings("job", "prometheus")
+		require.NoError(b, err)
+
+		rbPostings_2, err := irRB.Postings("job", "promscale")
+		require.NoError(b, err)
+
+		rbPostings_3, err := irRB.Postings("job", "demo")
+		require.NoError(b, err)
+
+		rbPostings_4, err := irRB.Postings("job", "robust")
+		require.NoError(b, err)
+
+		rb_index.Merge(rbPostings_1, rbPostings_2, rbPostings_3, rbPostings_4)
+	})
 }
 
 func BenchmarkUnion(b *testing.B) {

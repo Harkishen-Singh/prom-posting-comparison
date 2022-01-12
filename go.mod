@@ -3,13 +3,14 @@ module github.com/Harkishen-Singh/prom-postings-comparison
 go 1.17
 
 require (
-	github.com/dgraph-io/sroar v0.0.0-20211124172931-39228b21f455
+	github.com/dgraph-io/sroar v0.0.0-20211209113350-3e3f1b382a64
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/prometheus v1.8.2-0.20211203003126-b9b57f9900dd
 	github.com/stretchr/testify v1.7.0
 )
 
 require (
+	github.com/Harkishen-Singh/prometheus-index-roaringbitmaps v0.0.0-20220106080035-7f40fda24215 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
