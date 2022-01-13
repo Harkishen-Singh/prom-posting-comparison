@@ -86,8 +86,8 @@ func BenchmarkIntersection(b *testing.B) {
 	require.Equal(b, numBigEndian, numRoaring)
 }
 
-const be_index_path = "data/index_big_endian"
-const rb_index_path = "data/index_roaring_bitmap"
+const be_index_path = "data/big_endian_index"
+const rb_index_path = "data/roaring_bitmap_index"
 
 func BenchmarkIntersectionRealIndex(b *testing.B) {
 	b.Run("Intersect_big_endian_real_index", func(b *testing.B) {
@@ -220,7 +220,7 @@ func BenchmarkUnion(b *testing.B) {
 const be_blockpath = "data/be_block"
 const rb_blockpath = "data/rb_block"
 
-func TestConvertBigEndianBlockToRoaringBitmapBLock(t *testing.T) {
+func ConvertBigEndianBlockToRoaringBitmapBLock(t *testing.T) {
 	block, err := be_tsdb.OpenBlock(log.NewLogfmtLogger(os.Stdout), be_blockpath, be_chunkenc.NewPool())
 	querier, err := be_tsdb.NewBlockQuerier(block, 0, 1641945600000)
 	require.NoError(t, err)
