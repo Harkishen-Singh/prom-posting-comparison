@@ -1,13 +1,25 @@
 package main
 
 import (
+	"context"
 	"encoding/binary"
+	"fmt"
+	"os"
 	"testing"
 
-	rb_index "github.com/Harkishen-Singh/prometheus-index-roaringbitmaps/tsdb/index"
 	"github.com/dgraph-io/sroar"
-	be_index "github.com/prometheus/prometheus/tsdb/index"
+	"github.com/go-kit/log"
 	"github.com/stretchr/testify/require"
+
+	"github.com/prometheus/prometheus/model/labels"
+	"github.com/prometheus/prometheus/storage"
+
+	rb_tsdb "github.com/Harkishen-Singh/prometheus-index-roaringbitmaps/tsdb"
+	rb_index "github.com/Harkishen-Singh/prometheus-index-roaringbitmaps/tsdb/index"
+
+	be_tsdb "github.com/prometheus/prometheus/tsdb"
+	be_chunkenc "github.com/prometheus/prometheus/tsdb/chunkenc"
+	be_index "github.com/prometheus/prometheus/tsdb/index"
 )
 
 func generateSeriesIds(start, end, incr int) []uint32 {
@@ -203,4 +215,41 @@ func BenchmarkUnion(b *testing.B) {
 	})
 
 	require.Equal(b, numBigEndian, numRoaring)
+}
+
+const be_blockpath = "data/be_block"
+const rb_blockpath = "data/rb_block"
+
+func TestConvertBigEndianBlockToRoaringBitmapBLock(t *testing.T) {
+	block, err := be_tsdb.OpenBlock(log.NewLogfmtLogger(os.Stdout), be_blockpath, be_chunkenc.NewPool())
+	querier, err := be_tsdb.NewBlockQuerier(block, 0, 1641945600000)
+	require.NoError(t, err)
+
+	matcher := labels.MustNewMatcher(labels.MatchRegexp, "__name__", ".+")
+	seriesSet := querier.Select(false, &storage.SelectHints{
+		Start: 0,
+		End:   1641945600000,
+		Step:  1,
+	}, matcher)
+
+	blockWriter, err := rb_tsdb.NewBlockWriter(log.NewLogfmtLogger(os.Stdout), rb_blockpath, 100*1024*1024*1024)
+	require.NoError(t, err)
+	defer blockWriter.Close()
+
+	for seriesSet.Next() {
+		serie := seriesSet.At()
+		lbls := serie.Labels()
+		itr := serie.Iterator()
+		seriesAppender := blockWriter.Appender(context.Background())
+		seriesRef := storage.SeriesRef(0)
+		for itr.Next() {
+			ts, v := itr.At()
+			seriesRef, err = seriesAppender.Append(seriesRef, lbls, ts, v)
+			require.NoError(t, err)
+		}
+		require.NoError(t, seriesAppender.Commit())
+	}
+	ulid, err := blockWriter.Flush(context.Background())
+	require.NoError(t, err)
+	fmt.Println("roaring bitmap index block ulid", ulid)
 }
