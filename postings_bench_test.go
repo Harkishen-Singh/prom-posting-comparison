@@ -90,6 +90,7 @@ const be_index_path = "data/big_endian_index"
 const rb_index_path = "data/roaring_bitmap_index"
 
 func BenchmarkIntersectionRealIndex(b *testing.B) {
+	c_be := 0
 	b.Run("Intersect_big_endian_real_index", func(b *testing.B) {
 		irBE, err := be_index.NewFileReader(be_index_path)
 		require.NoError(b, err)
@@ -107,9 +108,13 @@ func BenchmarkIntersectionRealIndex(b *testing.B) {
 		bePostings_4, err := irBE.Postings("job", "robust")
 		require.NoError(b, err)
 
-		be_index.Intersect(bePostings_1, bePostings_2, bePostings_3, bePostings_4)
+		p := be_index.Intersect(bePostings_1, bePostings_2, bePostings_3, bePostings_4)
+		for p.Next() {
+			c_be++
+		}
 	})
 
+	c_rb := 0
 	b.Run("Intersect_roaring_bitmap_real_index", func(b *testing.B) {
 		irRB, err := rb_index.NewFileReader(rb_index_path)
 		require.NoError(b, err)
@@ -127,11 +132,17 @@ func BenchmarkIntersectionRealIndex(b *testing.B) {
 		rbPostings_4, err := irRB.Postings("job", "robust")
 		require.NoError(b, err)
 
-		rb_index.Intersect(rbPostings_1, rbPostings_2, rbPostings_3, rbPostings_4)
+		p := rb_index.Intersect(rbPostings_1, rbPostings_2, rbPostings_3, rbPostings_4)
+		for p.Next() {
+			c_rb++
+		}
 	})
+
+	require.Equal(b, c_be, c_rb)
 }
 
 func BenchmarkUnionRealIndex(b *testing.B) {
+	c_be := 0
 	b.Run("Union_big_endian_real_index", func(b *testing.B) {
 		irBE, err := be_index.NewFileReader(be_index_path)
 		require.NoError(b, err)
@@ -149,9 +160,13 @@ func BenchmarkUnionRealIndex(b *testing.B) {
 		bePostings_4, err := irBE.Postings("job", "robust")
 		require.NoError(b, err)
 
-		be_index.Merge(bePostings_1, bePostings_2, bePostings_3, bePostings_4)
+		p := be_index.Merge(bePostings_1, bePostings_2, bePostings_3, bePostings_4)
+		for p.Next() {
+			c_be++
+		}
 	})
 
+	c_rb := 0
 	b.Run("Union_roaring_bitmap_real_index", func(b *testing.B) {
 		irRB, err := rb_index.NewFileReader(rb_index_path)
 		require.NoError(b, err)
@@ -169,8 +184,13 @@ func BenchmarkUnionRealIndex(b *testing.B) {
 		rbPostings_4, err := irRB.Postings("job", "robust")
 		require.NoError(b, err)
 
-		rb_index.Merge(rbPostings_1, rbPostings_2, rbPostings_3, rbPostings_4)
+		p := rb_index.Merge(rbPostings_1, rbPostings_2, rbPostings_3, rbPostings_4)
+		for p.Next() {
+			c_rb++
+		}
 	})
+
+	require.Equal(b, c_be, c_rb)
 }
 
 func BenchmarkUnion(b *testing.B) {
