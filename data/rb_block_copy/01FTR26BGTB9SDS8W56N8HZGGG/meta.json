@@ -1,0 +1,17 @@
+{
+	"ulid": "01FTR26BGTB9SDS8W56N8HZGGG",
+	"minTime": 1641924000125,
+	"maxTime": 1641945599798,
+	"stats": {
+		"numSamples": 71362225,
+		"numSeries": 107121,
+		"numChunks": 696854
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01FTR26BGTB9SDS8W56N8HZGGG"
+		]
+	},
+	"version": 1
+}
