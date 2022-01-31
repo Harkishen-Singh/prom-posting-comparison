@@ -3,7 +3,7 @@ module github.com/Harkishen-Singh/prom-posting-comparison
 go 1.17
 
 require (
-	github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131133216-e722b3a4ca9e
+	github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131151349-1d52f2d57db3
 	github.com/dgraph-io/sroar v0.0.0-20211209113350-3e3f1b382a64
 	github.com/go-kit/log v0.2.0
 	github.com/pkg/errors v0.9.1

@@ -316,11 +316,11 @@ var queries = []benchQueries{
 	{
 		id: 3,
 		pmatchers: []*p_labels.Matcher{
-			p_labels.MustNewMatcher(p_labels.MatchEqual, "job", "prometheus"),
+			p_labels.MustNewMatcher(p_labels.MatchRegexp, "job", ".*"),
 			p_labels.MustNewMatcher(p_labels.MatchNotEqual, "__name__", "go_goroutines"),
 		},
 		hmatchers: []*h_labels.Matcher{
-			h_labels.MustNewMatcher(h_labels.MatchEqual, "job", "prometheus"),
+			h_labels.MustNewMatcher(h_labels.MatchRegexp, "job", ".*"),
 			h_labels.MustNewMatcher(h_labels.MatchNotEqual, "__name__", "go_goroutines"),
 		},
 	},
@@ -347,10 +347,10 @@ func BenchmarkPromQLQueries(b *testing.B) {
 	var rb_series_set h_storage.SeriesSet
 
 	for i := range queries {
-		b.Run("big_endian", func(b *testing.B) {
+		b.Run(fmt.Sprintf("big_endian_%d", i+1), func(b *testing.B) {
 			be_series_set = be_querier.Select(false, nil, queries[i].pmatchers...)
 		})
-		b.Run("roaring_bitmap", func(b *testing.B) {
+		b.Run(fmt.Sprintf("roaring_bitmap_%d", i+1), func(b *testing.B) {
 			rb_series_set = rb_querier.Select(false, nil, queries[i].hmatchers...)
 		})
 	}

@@ -110,6 +110,14 @@ github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131113042-00fe544264a8 h1:IX
 github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131113042-00fe544264a8/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
 github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131133216-e722b3a4ca9e h1:NYk0/sLcuLoI8LjOeOemTWI3BXSSXHo5AR4ErHnyhAQ=
 github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131133216-e722b3a4ca9e/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131134514-a0ce6000747c h1:p83EL3tkheP8CLOSqaEPBzY4/iKyi4VHZRyKm9hszj0=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131134514-a0ce6000747c/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131150123-4841e8656085 h1:wVSppQ37iG7jmukDoV+JFexqdJhU4vNPGCbpdCzUMbU=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131150123-4841e8656085/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131150728-31a74d6a2a09 h1:KfdbQSKqTpvs7HSjNOV2zYnamd0h7kiJusOhO5XeK3A=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131150728-31a74d6a2a09/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131151349-1d52f2d57db3 h1:GJXCT44/F8I3EduYQoA31899ZUxmGDKVns7EFov6etI=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220131151349-1d52f2d57db3/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
 github.com/HdrHistogram/hdrhistogram-go v1.1.0/go.mod h1:yDgFjdqOqDEKOvasDdhWNXYg9BVp4O+o5f6V/ehm6Oo=
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
