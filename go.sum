@@ -126,6 +126,8 @@ github.com/Harkishen-Singh/prometheus v1.8.2-0.20220201132315-0b01d1708795 h1:/E
 github.com/Harkishen-Singh/prometheus v1.8.2-0.20220201132315-0b01d1708795/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
 github.com/Harkishen-Singh/prometheus v1.8.2-0.20220201133332-3d7a40e393e7 h1:ZtfSaxSbuTA43Xh6ZEIBendTlibn8tLKzox+X1ymG3w=
 github.com/Harkishen-Singh/prometheus v1.8.2-0.20220201133332-3d7a40e393e7/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220201134846-cf130a00dc28 h1:jKbUQoNTnHx7NNboqj7w1V6X6852h1VpoNHfrssry6U=
+github.com/Harkishen-Singh/prometheus v1.8.2-0.20220201134846-cf130a00dc28/go.mod h1:c/lK0xYE7bpJ88/CSpIdceExHsnG1PeCMjwV/S81Yis=
 github.com/HdrHistogram/hdrhistogram-go v1.1.0/go.mod h1:yDgFjdqOqDEKOvasDdhWNXYg9BVp4O+o5f6V/ehm6Oo=
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
