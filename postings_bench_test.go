@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"os"
 	"testing"
 
@@ -278,7 +279,7 @@ func convertLabels(p p_labels.Labels) h_labels.Labels {
 	hLabels := []h_labels.Label{}
 	for i := range p {
 		l := h_labels.Label{
-			Name: p[i].Name,
+			Name:  p[i].Name,
 			Value: p[i].Value,
 		}
 		hLabels = append(hLabels, l)
@@ -287,7 +288,7 @@ func convertLabels(p p_labels.Labels) h_labels.Labels {
 }
 
 type benchQueries struct {
-	id int
+	id        int
 	pmatchers []*p_labels.Matcher
 	hmatchers []*h_labels.Matcher
 }
@@ -296,15 +297,6 @@ var queries = []benchQueries{
 	{
 		id: 1,
 		pmatchers: []*p_labels.Matcher{
-			p_labels.MustNewMatcher(p_labels.MatchRegexp, "__name__", ".+"),
-		},
-		hmatchers: []*h_labels.Matcher{
-			h_labels.MustNewMatcher(h_labels.MatchRegexp, "__name__", ".+"),
-		},
-	},
-	{
-		id: 2,
-		pmatchers: []*p_labels.Matcher{
 			p_labels.MustNewMatcher(p_labels.MatchEqual, "job", "prometheus"),
 			p_labels.MustNewMatcher(p_labels.MatchEqual, "__name__", "go_goroutines"),
 		},
@@ -312,16 +304,37 @@ var queries = []benchQueries{
 			h_labels.MustNewMatcher(h_labels.MatchEqual, "job", "prometheus"),
 			h_labels.MustNewMatcher(h_labels.MatchEqual, "__name__", "go_goroutines"),
 		},
-	},
-	{
-		id: 3,
+	}, {
+		id: 2,
 		pmatchers: []*p_labels.Matcher{
-			p_labels.MustNewMatcher(p_labels.MatchRegexp, "job", ".*"),
+			p_labels.MustNewMatcher(p_labels.MatchEqual, "pod", "alertmanager-main-2"),
 			p_labels.MustNewMatcher(p_labels.MatchNotEqual, "__name__", "go_goroutines"),
 		},
 		hmatchers: []*h_labels.Matcher{
-			h_labels.MustNewMatcher(h_labels.MatchRegexp, "job", ".*"),
+			h_labels.MustNewMatcher(h_labels.MatchEqual, "pod", "alertmanager-main-2"),
 			h_labels.MustNewMatcher(h_labels.MatchNotEqual, "__name__", "go_goroutines"),
+		},
+	}, {
+		id: 3,
+		pmatchers: []*p_labels.Matcher{
+			p_labels.MustNewMatcher(p_labels.MatchEqual, "__name__", "go_gc_duration_seconds"),
+			p_labels.MustNewMatcher(p_labels.MatchEqual, "job", "demo"),
+		},
+		hmatchers: []*h_labels.Matcher{
+			h_labels.MustNewMatcher(h_labels.MatchEqual, "__name__", "go_gc_duration_seconds"),
+			h_labels.MustNewMatcher(h_labels.MatchEqual, "job", "demo"),
+		},
+	}, {
+		id: 4,
+		pmatchers: []*p_labels.Matcher{
+			p_labels.MustNewMatcher(p_labels.MatchRegexp, "instance", "10.42.*"),
+			p_labels.MustNewMatcher(p_labels.MatchEqual, "service", "alertmanager-main"),
+			p_labels.MustNewMatcher(p_labels.MatchEqual, "endpoint", "reloader-web"),
+		},
+		hmatchers: []*h_labels.Matcher{
+			h_labels.MustNewMatcher(h_labels.MatchRegexp, "instance", "10.42.*"),
+			h_labels.MustNewMatcher(h_labels.MatchEqual, "service", "alertmanager-main"),
+			h_labels.MustNewMatcher(h_labels.MatchEqual, "endpoint", "reloader-web"),
 		},
 	},
 }
@@ -347,15 +360,17 @@ func BenchmarkPromQLQueries(b *testing.B) {
 	var rb_series_set h_storage.SeriesSet
 
 	for i := range queries {
-		b.Run(fmt.Sprintf("big_endian_%d", i+1), func(b *testing.B) {
+		b.Run(fmt.Sprintf("big_endian_%d", queries[i].id), func(b *testing.B) {
 			be_series_set = be_querier.Select(false, nil, queries[i].pmatchers...)
 		})
-		b.Run(fmt.Sprintf("roaring_bitmap_%d", i+1), func(b *testing.B) {
+		b.Run(fmt.Sprintf("roaring_bitmap_%d", queries[i].id), func(b *testing.B) {
 			rb_series_set = rb_querier.Select(false, nil, queries[i].hmatchers...)
 		})
+		compareSeriesSet(b, be_series_set, rb_series_set)
 	}
+}
 
-	// Verify similar outputs.
+func compareSeriesSet(b *testing.B, be_series_set p_storage.SeriesSet, rb_series_set h_storage.SeriesSet) {
 	for {
 		containsBE := be_series_set.Next()
 		containsRB := rb_series_set.Next()
@@ -374,25 +389,25 @@ func BenchmarkPromQLQueries(b *testing.B) {
 		labelsRB := seriesSetRB.Labels()
 		require.Equal(b, convertLabels(labelsBE), labelsRB)
 
-		//itrBE := seriesSetBE.Iterator()
-		//itrRB := seriesSetRB.Iterator()
-		//for {
-		//	hasMoreBE := itrBE.Next()
-		//	hasMoreRB := itrRB.Next()
-		//	require.Equal(b, hasMoreBE, hasMoreRB)
-		//
-		//	if !hasMoreRB || !hasMoreBE {
-		//		break
-		//	}
-		//
-		//	tsBE, vBE := itrBE.At()
-		//	tsRB, vRB := itrRB.At()
-		//	require.Equal(b, tsBE, tsRB)
-		//	if math.IsNaN(vBE) {
-		//		require.True(b, math.IsNaN(vRB))
-		//		continue
-		//	}
-		//	require.EqualValues(b, vBE, vRB)
-		//}
+		itrBE := seriesSetBE.Iterator()
+		itrRB := seriesSetRB.Iterator()
+		for {
+			hasMoreBE := itrBE.Next()
+			hasMoreRB := itrRB.Next()
+			require.Equal(b, hasMoreBE, hasMoreRB)
+
+			if !hasMoreRB || !hasMoreBE {
+				break
+			}
+
+			tsBE, vBE := itrBE.At()
+			tsRB, vRB := itrRB.At()
+			require.Equal(b, tsBE, tsRB)
+			if math.IsNaN(vBE) {
+				require.True(b, math.IsNaN(vRB))
+				continue
+			}
+			require.EqualValues(b, vBE, vRB)
+		}
 	}
 }
